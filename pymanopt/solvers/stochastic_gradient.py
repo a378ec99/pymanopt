@@ -19,7 +19,7 @@ class StochasticGradient(Solver):
         """
         Perform optimization using stochastic gradient.
         This method first computes the gradient (derivative) of obj
-        w.r.t. arg based on a mini-batch of samples, and then optimizes by
+        based on a mini-batch of samples, and then optimizes by
         moving in the direction of ? with a step size rule based on ?.
         Arguments:
             - problem
@@ -56,10 +56,11 @@ class StochasticGradient(Solver):
 
         while True:
 
-            # TODO sample without replacement a mini-batch and use it as x.
-
             # Calculate new cost, grad and gradnorm
             cost = objective(x)
+
+            # TODO Cost function draws with replacement from possible samples (randomly).
+            
             grad = gradient(x)
             gradnorm = man.norm(x, grad)
             iter = iter + 1
@@ -70,11 +71,12 @@ class StochasticGradient(Solver):
             if self._logverbosity >= 2:
                 self._append_optlog(iter, x, cost, gradnorm=gradnorm)
 
-            # Descent direction is minus the gradient # WARNING What direction to use?
+            # Descent direction is minus the gradient 
             desc_dir = -grad
 
             # Perform line-search
-            stepsize, x = # TODO use step-size function to make step and return size.
+            stepsize, x = linesearch.search(objective, man, x, desc_dir,
+                                            cost, -gradnorm**2)
 
             stop_reason = self._check_stopping_criterion(
                 time0, stepsize=stepsize, gradnorm=gradnorm, iter=iter)
